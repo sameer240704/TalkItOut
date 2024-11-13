@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useAuthContext } from "./useAuthContext";
+import { LOGIN_ROUTE } from "../utils/constants";
 import axios from "axios";
-
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 export const useLogin = () => {
     const [error, setError] = useState(null);
@@ -15,19 +14,18 @@ export const useLogin = () => {
 
         try {
             const response = await axios.post(
-                `${SERVER_URL}/server/auth/login`,
+                LOGIN_ROUTE,
                 formData,
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type": "application/json",
                     }
                 }
             );
 
             if (response.status === 200) {
-                const user = response.data;
-                console.log(user);
-                localStorage.setItem("user", JSON.stringify(user));
+                const user = response.data.userId;
+                localStorage.setItem("user", user);
                 dispatch({ type: "LOGIN", payload: user });
                 setIsLoading(false);
                 return { success: true };

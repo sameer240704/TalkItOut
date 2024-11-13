@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useAuthContext } from "./useAuthContext";
 import axios from "axios";
-
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+import { REGISTER_ROUTE } from "../utils/constants";
 
 export const useRegister = () => {
     const [error, setError] = useState(null);
@@ -15,7 +14,7 @@ export const useRegister = () => {
 
         try {
             const response = await axios.post(
-                `${SERVER_URL}/server/auth/register`,
+                REGISTER_ROUTE,
                 formData,
                 {
                     headers: {
@@ -26,7 +25,6 @@ export const useRegister = () => {
 
             if (response.status === 200) {
                 const user = response.data.userId;
-                console.log(user);
                 localStorage.setItem("user", user);
                 dispatch({ type: "LOGIN", payload: user });
                 setIsLoading(false);

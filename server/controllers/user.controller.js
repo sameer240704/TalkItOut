@@ -5,6 +5,12 @@ import cloudinary from "cloudinary";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'internship_dedo_please';
 
+const maxAge = 3 * 24 * 60 * 60 * 1000;
+
+const createToken = (email, userId) => {
+    return jwt.sign({ email, userId }, process.env.JWT_SECRET, { expiresIn: maxAge })
+}
+
 export const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -49,15 +55,10 @@ export const registerUser = async (req, res) => {
         const newUser = new User(userData);
         await newUser.save();
 
-        const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, {
-            expiresIn: "1h",
-        });
-
-        res.cookie('token', token, {
+        res.cookie('token', createToken(email, newUser._id), {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Strict',
-            maxAge: 3600000,
+            secure: true,
+            sameSite: 'None',
         });
 
         res.status(200).json({ message: "User created successfully", userId: newUser._id });
@@ -85,15 +86,10 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const token = jwt.sign({ userId: existingUser._id }, JWT_SECRET, {
-            expiresIn: "1h",
-        });
-
-        res.cookie('token', token, {
+        res.cookie('token', createToken(email, existingUser._id), {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Strict',
-            maxAge: 3600000,
+            secure: true,
+            sameSite: 'None',
         });
 
         return res.status(200).json({
@@ -110,7 +106,7 @@ export const verifyUser = async (req, res) => {
     const { userId } = req.body;
 
     try {
-        const existingUser = await User.findOne(userId);
+        const existingUser = await User.findOne({ _id: userId });
 
         if (!existingUser) {
             return res.status(400).json({ message: "User not found" });
@@ -119,6 +115,31 @@ export const verifyUser = async (req, res) => {
         return res.status(200).json({ message: "User found" });
     } catch (error) {
         console.error("Error in verifyUser:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+// Return details for current user
+export const getCurrentUser = async (req, res, next) => {
+    const { userId } = req.query;
+    console.log("USER: ", userId)
+
+    try {
+        const existingUser = await User.findOne({ _id: userId });
+
+        if (!existingUser) {
+            return res.status(400).json({ message: "User not found" })
+        }
+
+        const userDetails = {
+            name: existingUser.name,
+            email: existingUser.email,
+            avatarImage: existingUser.avatarImage
+        }
+
+        return res.status(200).json({ message: "User details found", userDetails })
+    } catch (error) {
+        console.error("Error in getCurrentUser:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }

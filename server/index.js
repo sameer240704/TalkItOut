@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
 import connectToDatabase from "./db/db.js";
 import bodyParser from "body-parser";
-import router from "./routes.js";
+import AuthRouter from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -31,7 +31,7 @@ app.use(cookieParser());
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
-app.use("/server", router);
+app.use("/api/auth", AuthRouter);
 
 connectToDatabase();
 

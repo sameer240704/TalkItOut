@@ -11,11 +11,15 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const result = verifyUser();
+    const verify = async () => {
+      const result = await verifyUser();
 
-    if (result) {
-      navigate("/talkitout");
-    }
+      if (result.success) {
+        navigate("/talkitout");
+      }
+    };
+
+    verify();
   }, []);
 
   return (

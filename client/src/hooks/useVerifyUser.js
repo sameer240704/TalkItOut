@@ -1,15 +1,17 @@
 import axios from "axios";
-
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+import { VERIFY_ROUTE } from "../utils/constants";
 
 export const useVerifyUser = () => {
     const verifyUser = async () => {
         try {
             const userId = localStorage.getItem("user");
+            if (!userId) {
+                return { success: false };
+            }
 
             const response = await axios.post(
-                `${SERVER_URL}/server/auth/verifyUser`,
-                userId,
+                VERIFY_ROUTE,
+                { userId },
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -18,7 +20,6 @@ export const useVerifyUser = () => {
             );
 
             if (response.status === 200) {
-                const user = response.data;
                 return { success: true };
             } else {
                 return { success: false, message: "Login failed. Please try again." };
