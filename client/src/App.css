@@ -81,3 +81,21 @@
     transform: translateY(10%) translateX(20%) rotate(12deg);
   }
 }
+
+/* Popup Scroll */
+.popup-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.popup-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.popup-scroll::-webkit-scrollbar-thumb {
+  background-color: #141414;
+  border-radius: 10px;
+}
+
+.popup-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

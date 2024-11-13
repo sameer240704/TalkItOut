@@ -6,7 +6,6 @@ import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
 import { useRegister } from "../hooks/useRegister";
-import { useVerifyUser } from "../hooks/useVerifyUser";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -15,20 +14,7 @@ const Register = () => {
   const [avatarImage, setAvatarImage] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   const { register, isLoading, error } = useRegister();
-  const { verifyUser } = useVerifyUser();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const verify = async () => {
-      const result = await verifyUser();
-
-      if (result.success) {
-        navigate("/talkitout");
-      }
-    };
-
-    verify();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -3,8 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cloudinary from "cloudinary";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'internship_dedo_please';
-
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
 const createToken = (email, userId) => {
@@ -59,6 +57,7 @@ export const registerUser = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'None',
+            maxAge: 1000 * 60 * 60 * 24,
         });
 
         res.status(200).json({ message: "User created successfully", userId: newUser._id });
@@ -90,6 +89,7 @@ export const loginUser = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'None',
+            maxAge: 1000 * 60 * 60 * 24,
         });
 
         return res.status(200).json({
@@ -102,27 +102,9 @@ export const loginUser = async (req, res) => {
     }
 };
 
-export const verifyUser = async (req, res) => {
-    const { userId } = req.body;
-
-    try {
-        const existingUser = await User.findOne({ _id: userId });
-
-        if (!existingUser) {
-            return res.status(400).json({ message: "User not found" });
-        }
-
-        return res.status(200).json({ message: "User found" });
-    } catch (error) {
-        console.error("Error in verifyUser:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
 // Return details for current user
 export const getCurrentUser = async (req, res, next) => {
     const { userId } = req.query;
-    console.log("USER: ", userId)
 
     try {
         const existingUser = await User.findOne({ _id: userId });
@@ -134,7 +116,8 @@ export const getCurrentUser = async (req, res, next) => {
         const userDetails = {
             name: existingUser.name,
             email: existingUser.email,
-            avatarImage: existingUser.avatarImage
+            avatarImage: existingUser.avatarImage,
+            bioData: existingUser.bioData
         }
 
         return res.status(200).json({ message: "User details found", userDetails })
@@ -143,3 +126,61 @@ export const getCurrentUser = async (req, res, next) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const logout = async (req, res, next) => {
+    try {
+        res.cookie('token', '', { maxAge: 1, httpOnly: false, secure: true, sameSite: "None" });
+        return res.status(200).send("Logout successful");
+    } catch (error) {
+        console.error("Error in logout:", error);
+        return res.status(500).send("Internal Server Error ");
+    }
+};
+
+export const getAllUsers = async (req, res, next) => {
+    const { userId } = req.query;
+
+    try {
+        const users = await User.find({ _id: { $ne: userId } }).select("name bioData avatarImage");
+
+        return res.status(200).json({
+            message: "Users fetched successfully",
+            users,
+        });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const updateUserBioData = async (req, res) => {
+    const { userId, bioData } = req.body;
+
+    try {
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { bioData },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const userDetails = {
+            name: user.name,
+            email: user.email,
+            avatarImage: user.avatarImage,
+            bioData: user.bioData
+        }
+
+        return res.status(200).json({
+            message: "Bio updated successfully",
+            userDetails
+        });
+    } catch (error) {
+        console.error("Error updating bio:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+

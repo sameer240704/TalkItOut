@@ -6,10 +6,11 @@ import HTML from "./images/snap-html.png"
 import JS from "./images/snap-js.png"
 import Logo from "./images/logo.png"
 import Phone from "./images/phone.png"
+import User from "./images/user.jpg"
 
 // Icons
 
 import Google from "./icons/google.png";
 import Apple from "./icons/apple.png";
 
-export { CPP, CSS, HTML, JS, Logo, Phone, Google, Apple }
+export { CPP, CSS, HTML, JS, Logo, Phone, Google, Apple, User }

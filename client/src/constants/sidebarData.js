@@ -1,4 +1,4 @@
-import { MessageSquare, UsersRound } from 'lucide-react';
+import { MessageSquare, UsersRound, CircleUserRound, BellRing, LockKeyhole, LogOut } from 'lucide-react';
 
 export const sidebarData = [
     {
@@ -10,5 +10,24 @@ export const sidebarData = [
         icon: UsersRound,
         name: "Groups",
         route: "/talkitout/groups"
+    }
+]
+
+export const userSidebarData = [
+    {
+        icon: CircleUserRound,
+        name: "Account"
+    },
+    {
+        icon: BellRing,
+        name: "Notifications"
+    },
+    {
+        icon: LockKeyhole,
+        name: "Privacy"
+    },
+    {
+        icon: LogOut,
+        name: "Logout"
     }
 ]

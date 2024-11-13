@@ -19,7 +19,8 @@ export const useLogin = () => {
                 {
                     headers: {
                         "Content-Type": "application/json",
-                    }
+                    },
+                    withCredentials: true
                 }
             );
 

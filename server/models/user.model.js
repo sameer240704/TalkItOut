@@ -26,6 +26,15 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    bioData: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    friends: {
+        type: [String],
+        default: []
+    },
     createdAt: {
         type: Date,
         default: Date.now

@@ -1,7 +1,9 @@
 import React from "react";
 
 const MessagingArea = () => {
-  return <div className="w-3/5 h-full bg-green-300 rounded-2xl"></div>;
+  return (
+    <div className="h-full flex-grow rounded-2xl bg-light-primary dark:bg-dark-secondary"></div>
+  );
 };
 
 export default MessagingArea;

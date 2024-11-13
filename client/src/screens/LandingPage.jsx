@@ -4,24 +4,8 @@ import { Download, ExternalLink } from "lucide-react";
 import { Logo, Phone } from "../assets";
 import { ModeToggle } from "../components/ui/mode-toggle";
 import { Button } from "../components/ui/button";
-import { useVerifyUser } from "../hooks/useVerifyUser";
 
 const LandingPage = () => {
-  const { verifyUser } = useVerifyUser();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const verify = async () => {
-      const result = await verifyUser();
-
-      if (result.success) {
-        navigate("/talkitout");
-      }
-    };
-
-    verify();
-  }, []);
-
   return (
     <div className="h-screen bg-gradient-to-b from-white to-green-50 font-sans dark:from-black dark:to-[#011a11] overflow-hidden">
       <nav className="py-4 px-8 flex items-center justify-between border-b bg-white dark:bg-black shadow-md">

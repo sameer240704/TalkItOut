@@ -12,8 +12,8 @@ const app = express();
 dotenv.config();
 
 const corsOptions = {
-    origin: '*',
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'UPDATE'],
+    origin: process.env.WEB_URL,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 };
@@ -26,6 +26,7 @@ cloudinary.config({
 
 // Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: '100mb' }));

@@ -6,7 +6,6 @@ import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Checkbox } from "../components/ui/checkbox";
 import { useLogin } from "../hooks/useLogin";
-import { useVerifyUser } from "../hooks/useVerifyUser";
 
 const Login = () => {
   const [name, setName] = useState("");
@@ -14,20 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const { login, isLoading, error } = useLogin();
-  const { verifyUser } = useVerifyUser();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const verify = async () => {
-      const result = await verifyUser();
-
-      if (result.success) {
-        navigate("/talkitout");
-      }
-    };
-
-    verify();
-  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
