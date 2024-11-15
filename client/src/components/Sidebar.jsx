@@ -38,7 +38,6 @@ const Sidebar = () => {
   useEffect(() => {
     const verify = async () => {
       const userId = localStorage.getItem("user");
-      console.log("USER: ", userId);
 
       if (!userId) {
         navigate("/sign-in");
@@ -49,8 +48,6 @@ const Sidebar = () => {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-
-      console.log("USER: ", user);
 
       setCurrentUser(user.data.userDetails);
     };

@@ -137,22 +137,6 @@ export const logout = async (req, res, next) => {
     }
 };
 
-export const getAllUsers = async (req, res, next) => {
-    const { userId } = req.query;
-
-    try {
-        const users = await User.find({ _id: { $ne: userId } }).select("name bioData avatarImage");
-
-        return res.status(200).json({
-            message: "Users fetched successfully",
-            users,
-        });
-    } catch (error) {
-        console.error("Error fetching users:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-};
-
 export const updateUserBioData = async (req, res) => {
     const { userId, bioData } = req.body;
 

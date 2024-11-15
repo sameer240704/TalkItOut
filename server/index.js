@@ -6,6 +6,7 @@ import cloudinary from "cloudinary";
 import connectToDatabase from "./db/db.js";
 import bodyParser from "body-parser";
 import AuthRouter from "./routes/auth.routes.js";
+import FriendRouter from "./routes/friend.routes.js";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 app.use("/api/auth", AuthRouter);
+app.use("/api/friend", FriendRouter);
 
 connectToDatabase();
 

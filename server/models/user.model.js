@@ -29,7 +29,7 @@ const userSchema = new Schema({
     bioData: {
         type: String,
         required: false,
-        default: ""
+        default: "I am a TalkItOut User"
     },
     friends: {
         type: [String],
