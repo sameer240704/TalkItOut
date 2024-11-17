@@ -79,37 +79,6 @@ export const uploadDocument = async (req, res) => {
     }
 };
 
-export const sendMessage = async (req, res, next) => {
-    try {
-        const { recipientId, senderId, type, content, fileUrl, fileName } = req.body;
-        console.log(req.body);
-
-        if (type === "text" && !content) {
-            return res.status(400).json({ error: "Text content is required for a text message" });
-        }
-        if ((type === "image" || type === "document") && (!fileUrl || !fileName)) {
-            return res.status(400).json({ error: "File URL and file name are required for image/document message" });
-        }
-
-        const newMessage = new Message({
-            sender: senderId,
-            receiver: recipientId,
-            type,
-            content: type === "text" ? content : undefined,
-            fileUrl: type !== "text" ? fileUrl : undefined,
-            fileName: type === "document" ? fileName : undefined,
-        });
-
-        const savedMessage = await newMessage.save();
-
-        res.status(200).json(savedMessage);
-    } catch (error) {
-        console.error("Error sending message:", error);
-        res.status(500).json({ error: "Failed to send message" });
-        next();
-    }
-};
-
 export const getAllMessages = async (req, res, next) => {
     const { senderId, receiverId } = req.query;
 
@@ -136,8 +105,6 @@ export const getAllMessages = async (req, res, next) => {
                 receiverId: msg.receiver.toString(),
             };
         });
-
-        console.log(receiverId, ": ", formattedMessages);
 
         res.status(200).json({ message: "Messages fetched successfully", messages: formattedMessages });
     } catch (error) {

@@ -5,13 +5,16 @@ import App from "./App.jsx";
 import { AuthContextProvider } from "./context/auth.context.jsx";
 import { GlobalContextProvider } from "./context/global.context.jsx";
 import { Toaster } from "react-hot-toast";
+import SocketProvider from "./context/socket.context.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <GlobalContextProvider>
       <AuthContextProvider>
-        <App />
-        <Toaster />
+        <SocketProvider>
+          <App />
+          <Toaster />
+        </SocketProvider>
       </AuthContextProvider>
     </GlobalContextProvider>
   </StrictMode>

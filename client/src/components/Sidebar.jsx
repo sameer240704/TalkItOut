@@ -32,7 +32,8 @@ const SidebarIcon = ({ icon: Icon, name }) => {
 
 const Sidebar = () => {
   const [currentUser, setCurrentUser] = useState(null);
-  const { rightPanel, setRightPanel } = useGlobalContext();
+  const { rightPanel, setRightPanel, setIsRightPanelClose } =
+    useGlobalContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,6 +56,11 @@ const Sidebar = () => {
     verify();
   }, []);
 
+  const handleRightPanelClick = () => {
+    setRightPanel(currentUser.userId);
+    setIsRightPanelClose(false);
+  };
+
   return (
     <div className="h-full w-[2.5%] flex flex-col items-center justify-between bg-transparent">
       <div className="flex flex-col items-center">
@@ -71,7 +77,7 @@ const Sidebar = () => {
               : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqafzhnwwYzuOTjTlaYMeQ7hxQLy_Wq8dnQg&s"
           }
           className="h-8 w-8 rounded-full cursor-pointer"
-          onClick={() => setRightPanel(currentUser.userId)}
+          onClick={handleRightPanelClick}
         />
       </div>
     </div>

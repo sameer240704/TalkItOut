@@ -1,103 +1,96 @@
-import { Server as SocketIOServer } from "socket.io";
-import Message from "./models/MessagesModel.js";
+import { Server as SocketServer } from "socket.io";
+import Message from "./models/message.model.js";
 
-const setupSocket = (server) => {
-    const io = new SocketIOServer(server, {
+export const onlineUsers = new Map();
+
+export const setupSocket = (server) => {
+    const io = new SocketServer(server, {
         cors: {
-            origin: process.env.ORIGIN || "http://localhost:5173",
+            origin: process.env.WEB_URL || "http://localhost:5173",
             methods: ["GET", "POST"],
             credentials: true,
         },
     });
-    const userSocketMap = new Map();
 
     const disconnect = (socket) => {
-        console.log(`Client is disconnected: ${socket.id}`);
-        for (const [userId, socketId] of userSocketMap.entries()) {
+        console.log(`Client disconnected: ${socket.id}`);
+        for (const [userId, socketId] of onlineUsers.entries()) {
             if (socketId === socket.id) {
-                userSocketMap.delete(userId);
-                break;
+                onlineUsers.delete(userId);
+                io.emit("user_status", { userId, status: "offline" });
             }
         }
     };
 
-    const sendMessage = async (message) => {
-        const senderSocketId = userSocketMap.get(message.sender);
-        const recipientSocketId = userSocketMap.get(message.recipient);
+    const sendMessage = async (messageData) => {
+        try {
+            const { recipientId, senderId, type, content, fileUrl, fileName } = messageData;
 
-        const createdMessage = await Message.create(message);
+            if (type === "text" && !content) {
+                console.error("Text content is required for a text message");
+                return;
+            }
+            if ((type === "image" || type === "document") && (!fileUrl || !fileName)) {
+                console.error(`File URL and file name are required for ${type}`);
+                return;
+            }
 
-        const messageData = await Message.findById(createdMessage._id)
-            .populate("sender", "id email firstName lastName image color")
-            .populate("recipient", "id email firstName lastName image color");
+            const newMessage = new Message({
+                sender: senderId,
+                receiver: recipientId,
+                type,
+                content: type === "text" ? content : undefined,
+                fileUrl: type !== "text" ? fileUrl : undefined,
+                fileName: type === "document" ? fileName : undefined,
+            });
 
-        if (recipientSocketId) {
-            io.to(recipientSocketId).emit("receiveMessage", messageData);
-        }
-        if (senderSocketId) {
-            io.to(senderSocketId).emit("receiveMessage", messageData);
+            const savedMessage = await newMessage.save();
+
+            const messageDataToSend = await Message.findById(savedMessage._id)
+                .populate("sender", "id name email avatarImage bioData")
+                .populate("receiver", "id name email avatarImage bioData");
+
+            const recipientSocketId = onlineUsers.get(recipientId);
+            const senderSocketId = onlineUsers.get(senderId);
+
+            console.log(recipientSocketId, senderSocketId);
+
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit("receiveMessage", messageDataToSend);
+            }
+
+            if (senderSocketId) {
+                io.to(senderSocketId).emit("messageSent", messageDataToSend);
+            }
+
+        } catch (error) {
+            console.error("Error in sendMessage:", error.message);
         }
     };
 
-    //   const sendChannelMessage = async (message) => {
-    //     const { channelId, sender, content, messageType, fileUrl } = message;
-
-    //     // console.log("Incoming message:", { messageType, sender, channelId });
-    //     const createdMessage = await Message.create({
-    //       sender,
-    //       recipient: null,
-    //       content,
-    //       messageType,
-    //       timeStamp: new Date(),
-    //       fileUrl,
-    //     });
-    //     console.log("Message created:", createdMessage);
-    //     const messageData = await Message.findById(createdMessage._id)
-    //       .populate("sender", "id email firstName lastName image color ")
-    //       .exec();
-    //     await Channel.findByIdAndUpdate(channelId, {
-    //       $push: { messages: createdMessage._id },
-    //     });
-
-    //     const channel = await Channel.findById(channelId).populate("members");
-
-    //     const finalData = { ...messageData._doc, channelId: channel._id };
-
-    //     if (channel && channel.members) {
-    //       //console.log("mEMBERS:", channel.members);
-    //       channel.members.forEach((member) => {
-    //         const memberSocketId = userSocketMap.get(member._id.toString());
-
-    //         // console.log("members:", memberSocketId);
-    //         if (memberSocketId) {
-    //           io.to(memberSocketId).emit("recieve-channel-message", finalData);
-    //         }
-    //       });
-    //       const adminSocketId = userSocketMap.get(channel.admin._id.toString());
-    //       if (adminSocketId) {
-    //         io.to(adminSocketId).emit("recieve-channel-message", finalData);
-    //       }
-    //     }
-    //   };
     io.on("connection", (socket) => {
+        console.log(`New connection: ${socket.id}`);
         const userId = socket.handshake.query.userId;
 
-        if (!userId) {
-            console.log("No userId provided in socket connection.");
-            socket.emit("error", "User ID is required.");
-            return;
-        }
         if (userId) {
-            userSocketMap.set(userId, socket.id);
-            console.log(`User connected: ${userId} with socket ID: ${socket.id}`);
-        } else {
-            console.log("Id was not provided during connection");
+            onlineUsers.set(userId, socket.id);
+            onlineUsers.forEach((_, onlineUserId) => {
+                socket.emit("user_status", { userId: onlineUserId, status: "online" });
+            });
+
+            io.emit("user_status", { userId, status: "online" });
+
+            socket.emit("user_status", { userId, status: "online" });
         }
 
         socket.on("sendMessage", sendMessage);
-        // socket.on("send-channel-message", sendChannelMessage);
+        socket.on("typing", (data) => {
+            console.log(data);
+            socket.to(data.receiverId).emit("typing", { senderId: data.senderId });
+        });
+        socket.on("stopTyping", (data) => {
+            socket.to(data.receiverId).emit("stopTyping");
+        });
         socket.on("disconnect", () => disconnect(socket));
     });
 };
-
-export default setupSocket;

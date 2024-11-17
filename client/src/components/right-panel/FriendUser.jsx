@@ -6,7 +6,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const FriendUser = () => {
-  const { rightPanel, setRightPanel } = useGlobalContext();
+  const { rightPanel, setIsRightPanelClose } = useGlobalContext();
   const [currentSelected, setCurrentSelected] = useState(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const FriendUser = () => {
         <h1 className="text-2xl">Profile</h1>
         <X
           className="h-6 w-6 cursor-pointer dark:text-white hover:opacity-50"
-          onClick={() => setRightPanel(null)}
+          onClick={() => setIsRightPanelClose(true)}
         />
       </div>
 

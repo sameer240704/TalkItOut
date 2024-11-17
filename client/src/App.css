@@ -118,3 +118,9 @@
 .messaging-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.typing-indicator {
+  font-size: 12px;
+  font-style: italic;
+  padding: 5px 10px;
+}

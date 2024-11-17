@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import AuthRouter from "./routes/auth.routes.js";
 import FriendRouter from "./routes/friend.routes.js";
 import MessageRouter from "./routes/message.route.js";
+import { setupSocket } from "./socket.js";
 
 const app = express();
 
@@ -42,6 +43,8 @@ connectToDatabase();
 
 const PORT = process.env.PORT;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server listening to PORT ${PORT}`);
 });
+
+setupSocket(server);

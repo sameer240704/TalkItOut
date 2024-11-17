@@ -14,14 +14,6 @@ const userSchema = new Schema({
         unique: true,
         lowercase: true
     },
-    password: {
-        type: String,
-        required: true,
-    },
-    isOnline: {
-        type: Boolean,
-        default: false
-    },
     avatarImage: {
         type: String,
         required: true
@@ -31,13 +23,17 @@ const userSchema = new Schema({
         required: false,
         default: "I am a TalkItOut User"
     },
-    friends: {
-        type: [String],
-        default: []
+    password: {
+        type: String,
+        required: true,
     },
     isOnline: {
         type: Boolean,
-        default: true
+        default: false
+    },
+    friends: {
+        type: [String],
+        default: []
     },
     createdAt: {
         type: Date,
@@ -49,5 +45,5 @@ const userSchema = new Schema({
     }
 });
 
-const User = mongoose.model("user", userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;

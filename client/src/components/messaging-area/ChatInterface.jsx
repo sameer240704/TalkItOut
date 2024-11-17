@@ -20,14 +20,23 @@ import {
 } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import { useTheme } from "../theme-provider";
+import { useSocket } from "../../context/socket.context";
 
 const ChatHeader = (props) => {
-  const { setRightPanel } = useGlobalContext();
+  const { setRightPanel, setIsRightPanelClose } = useGlobalContext();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const { onlineStatus } = useSocket();
 
   useEffect(() => {
     setIsSearchExpanded(false);
   }, [props]);
+
+  const handleRightPanelClick = () => {
+    setRightPanel(props.userId);
+    setIsRightPanelClose(false);
+  };
+
+  const isUserOnline = onlineStatus[props.userId] || false;
 
   return (
     <div className="w-full h-20 flex items-center justify-between px-4 bg-light-primary dark:bg-dark-primary rounded-xl z-10">
@@ -37,14 +46,14 @@ const ChatHeader = (props) => {
           <img src={props.avatarImage} className="h-10 w-10 rounded-full" />
           <div
             className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 dark:border-dark-primary ${
-              !props.isOnline ? "bg-red-500" : "bg-green-600"
+              !isUserOnline ? "bg-red-500" : "bg-green-600"
             }`}
           ></div>
         </div>
         <div className="flex flex-col items-start justify-between">
           <h1 className="text-md font-semibold">{props.name}</h1>
           <h1 className="text-[12px] text-gray-800 dark:text-gray-400">
-            {props.isOnline ? "Online" : "Offline"}
+            {isUserOnline ? "Online" : "Offline"}
           </h1>
         </div>
       </div>
@@ -73,21 +82,23 @@ const ChatHeader = (props) => {
 
         <EllipsisVertical
           className="h-5 w-5 cursor-pointer"
-          onClick={() => setRightPanel(props.userId)}
+          onClick={handleRightPanelClick}
         />
       </div>
     </div>
   );
 };
 
-const ChatInput = ({ onSendMessage, onFileUpload }) => {
+const ChatInput = ({ userId, onSendMessage, onFileUpload }) => {
   const [message, setMessage] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const [isPlusOpen, setIsPlusOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
   const { theme } = useTheme();
+  const { socket } = useSocket();
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -138,6 +149,27 @@ const ChatInput = ({ onSendMessage, onFileUpload }) => {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("typing", {
+        senderId: localStorage.getItem("user"),
+        receiverId: userId,
+      });
+    }
+
+    const typingTimeout = setTimeout(() => {
+      setIsTyping(false);
+      socket.emit("stopTyping", {
+        senderId: localStorage.getItem("user"),
+        receiverId: userId,
+      });
+    }, 10000);
+    clearTimeout(typingTimeout);
   };
 
   const toggleEmojiPicker = () => {
@@ -211,7 +243,7 @@ const ChatInput = ({ onSendMessage, onFileUpload }) => {
         className="w-full h-10 bg-black bg-opacity-20 rounded-md outline-none active:border-none px-4 placeholder:text-sm text-gray-200"
         placeholder="Type a message"
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleTyping}
         onKeyPress={handleKeyPress}
       />
 
@@ -315,8 +347,10 @@ const ChatMessagingArea = ({ messages }) => {
 
 const ChatInterface = ({ user }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const { rightPanel, setRightPanel } = useGlobalContext();
-  const [messages, setMessages] = useState([]);
+  const { setRightPanel, setIsRightPanelClose, messages, setMessages } =
+    useGlobalContext();
+  const [typingUser, setTypingUser] = useState(null);
+  const { socket } = useSocket();
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -329,6 +363,7 @@ const ChatInterface = ({ user }) => {
 
         setCurrentUser(response.data.userDetails);
         setRightPanel(user);
+        setIsRightPanelClose(false);
       } catch (error) {
         toast.error("Please try again later");
       }
@@ -361,6 +396,30 @@ const ChatInterface = ({ user }) => {
     if (user && senderUser) getAllMessages();
   }, [user]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("receiveMessage", (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    socket.on("typing", (data) => {
+      setTypingUser(data.senderId);
+    });
+
+    socket.on("stopTyping", () => {
+      setTypingUser(null);
+    });
+
+    return () => {
+      if (socket) {
+        socket.off("receiveMessage");
+        socket.off("typing");
+        socket.off("stopTyping");
+      }
+    };
+  }, [socket]);
+
   const handleSendMessage = async (messageData) => {
     let newMessage;
     const senderId = localStorage.getItem("user");
@@ -370,25 +429,22 @@ const ChatInterface = ({ user }) => {
         ...messageData,
         senderId: senderId,
       };
+
       setMessages((prev) => [...prev, newMessage]);
 
-      const result = await axios.post(
-        SEND_MESSAGES,
-        {
-          recipientId: user,
-          senderId: senderId,
-          ...messageData,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      socket.emit("sendMessage", {
+        recipientId: user,
+        senderId: senderId,
+        ...messageData,
+      });
     } catch (error) {
       toast.error("Failed to send message");
 
       setMessages((prev) => prev.filter((msg) => msg !== newMessage));
     }
   };
+
+  console.log(typingUser);
 
   return (
     <div
@@ -403,9 +459,14 @@ const ChatInterface = ({ user }) => {
             userId={currentUser.userId}
             name={currentUser.name}
             avatarImage={currentUser.avatarImage}
-            isOnline={currentUser.isOnline}
           />
           <ChatMessagingArea messages={messages} />
+          {typingUser && typingUser !== currentUser.userId && (
+            <div className="typing-indicator text-gray-400 dark:text-gray-100">
+              {`${typingUser} is typing...`}
+            </div>
+          )}
+
           <ChatInput
             onSendMessage={handleSendMessage}
             onFileUpload={handleSendMessage}

@@ -48,7 +48,7 @@ const UserElement = ({ icon: Icon, name }) => {
 };
 
 const CurrentUser = () => {
-  const { rightPanel, setRightPanel } = useGlobalContext();
+  const { setRightPanel, setIsRightPanelClose } = useGlobalContext();
   const [currentUser, setCurrentUser] = useState(null);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioData, setBioData] = useState("");
@@ -110,7 +110,7 @@ const CurrentUser = () => {
         <h1 className="text-2xl">Profile</h1>
         <X
           className="h-6 w-6 cursor-pointer dark:text-white hover:opacity-50"
-          onClick={() => setRightPanel(null)}
+          onClick={() => setIsRightPanelClose(true)}
         />
       </div>
 
