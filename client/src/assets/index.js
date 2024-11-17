@@ -1,16 +1,17 @@
 // Images
 
 import CPP from "./images/snap-cpp.png";
-import CSS from "./images/snap-css.png"
-import HTML from "./images/snap-html.png"
-import JS from "./images/snap-js.png"
-import Logo from "./images/logo.png"
-import Phone from "./images/phone.png"
-import User from "./images/user.jpg"
+import CSS from "./images/snap-css.png";
+import HTML from "./images/snap-html.png";
+import JS from "./images/snap-js.png";
+import Logo from "./images/logo.png";
+import Phone from "./images/phone.png";
+import User from "./images/user.jpg";
+import Background from "./images/background.png";
 
 // Icons
 
 import Google from "./icons/google.png";
 import Apple from "./icons/apple.png";
 
-export { CPP, CSS, HTML, JS, Logo, Phone, Google, Apple, User }
+export { CPP, CSS, HTML, JS, Logo, Phone, Google, Apple, User, Background };

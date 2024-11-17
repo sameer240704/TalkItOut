@@ -9,9 +9,6 @@ const FriendUser = () => {
   const { rightPanel, setRightPanel } = useGlobalContext();
   const [currentSelected, setCurrentSelected] = useState(null);
 
-  console.log("SELECTED: ", currentSelected);
-  console.log("RIGHT PANEL: ", rightPanel);
-
   useEffect(() => {
     const getRightPanelUser = async () => {
       try {

@@ -16,3 +16,6 @@ export const GET_ALL_USER_FRIENDS = `${FRIEND_ROUTES}/get-users-friends`;
 
 export const MESSAGE_ROUTES = `${HOST}/api/messages`;
 export const GET_USER_PANEL_DETAILS = `${MESSAGE_ROUTES}/panel-details`;
+export const SEND_MESSAGES = `${MESSAGE_ROUTES}/send-message`;
+export const UPLOAD_DOCUMENT = `${MESSAGE_ROUTES}/upload-document`;
+export const GET_ALL_MESSAGES = `${MESSAGE_ROUTES}/get-all-messages`
