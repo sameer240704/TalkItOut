@@ -9,6 +9,7 @@ import AuthRouter from "./routes/auth.routes.js";
 import FriendRouter from "./routes/friend.routes.js";
 import MessageRouter from "./routes/message.route.js";
 import { setupSocket } from "./socket.js";
+import path from "path";
 
 const app = express();
 
