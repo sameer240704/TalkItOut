@@ -189,7 +189,7 @@ const LeftPanel = () => {
       <input
         type="text"
         placeholder="Search users..."
-        className="w-full px-3 py-2 mb-4 mt-3 rounded-md bg-white bg-opacity-30 text-black placeholder:text-gray-700   dark:text-white"
+        className="w-full px-3 py-2 mb-4 mt-3 rounded-md bg-white bg-opacity-30 text-black placeholder:text-gray-300 dark:text-white"
         value={friendsSearchQuery}
         onChange={(e) => setFriendsSearchQuery(e.target.value)}
       />
@@ -201,7 +201,7 @@ const LeftPanel = () => {
               <FriendCard key={user._id} user={user} />
             ))
           ) : (
-            <p className="text-gray-500">No friends found</p>
+            <p className="text-gray-300">No friends found</p>
           )}
         </div>
       </div>

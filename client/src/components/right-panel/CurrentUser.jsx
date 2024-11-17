@@ -116,15 +116,15 @@ const CurrentUser = () => {
 
       <div className="flex-col-center mt-5">
         <img
-          src={currentUser ? currentUser.avatarImage : User}
+          src={currentUser ? currentUser?.avatarImage : User}
           className="h-28 w-28 rounded-full"
           alt="User Image"
         />
         <h1 className="text-xl mt-2 font-semibold tracking-tight dark:text-white">
-          {currentUser.name || ""}
+          {currentUser?.name || ""}
         </h1>
         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">
-          {currentUser.email || ""}
+          {currentUser?.email || ""}
         </h3>
       </div>
 
@@ -164,7 +164,7 @@ const CurrentUser = () => {
 
       <div className="flex-col-center mt-10 w-full space-y-10 px-2">
         {userSidebarData.map((data) => (
-          <UserElement key={data.name} icon={data.icon} name={data.name} />
+          <UserElement key={data?.name} icon={data?.icon} name={data?.name} />
         ))}
       </div>
     </div>

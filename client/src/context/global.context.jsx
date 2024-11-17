@@ -9,10 +9,11 @@ export const useGlobalContext = () => {
 export const GlobalContextProvider = ({ children }) => {
   const [globalState, setGlobalState] = useState("Messages");
   const [rightPanel, setRightPanel] = useState(null);
+  const [currentFriend, setCurrentFriend] = useState(null);
 
   return (
     <GlobalContext.Provider
-      value={{ globalState, setGlobalState, rightPanel, setRightPanel }}
+      value={{ globalState, setGlobalState, rightPanel, setRightPanel, currentFriend, setCurrentFriend }}
     >
       {children}
     </GlobalContext.Provider>

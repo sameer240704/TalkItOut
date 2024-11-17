@@ -107,6 +107,9 @@ export const getCurrentUser = async (req, res, next) => {
     const { userId } = req.query;
 
     try {
+        if (!userId)
+            return res.status(400).json({ message: "User not found" });
+
         const existingUser = await User.findOne({ _id: userId });
 
         if (!existingUser) {
@@ -114,10 +117,12 @@ export const getCurrentUser = async (req, res, next) => {
         }
 
         const userDetails = {
+            userId: existingUser._id,
             name: existingUser.name,
             email: existingUser.email,
             avatarImage: existingUser.avatarImage,
-            bioData: existingUser.bioData
+            bioData: existingUser.bioData,
+            isOnline: existingUser.isOnline
         }
 
         return res.status(200).json({ message: "User details found", userDetails })

@@ -1,8 +1,18 @@
 import React from "react";
+import { useGlobalContext } from "../../context/global.context";
 
 const FriendCard = ({ user }) => {
+  const { currentFriend, setCurrentFriend } = useGlobalContext();
+
   return (
-    <div className="flex items-start justify-between px-2 py-3 rounded-xl cursor-pointer hover:bg-white hover:bg-opacity-20">
+    <div
+      className={`flex items-start justify-between px-2 py-3 rounded-xl cursor-pointer hover:bg-white hover:bg-opacity-10 ${
+        currentFriend === user._id
+          ? "bg-white bg-opacity-30 hover:bg-opacity-30"
+          : ""
+      }`}
+      onClick={() => setCurrentFriend(user._id)}
+    >
       <div className="flex flex-row items-start">
         <img
           src={user.avatarImage}

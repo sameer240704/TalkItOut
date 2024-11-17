@@ -71,7 +71,7 @@ const Sidebar = () => {
               : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqafzhnwwYzuOTjTlaYMeQ7hxQLy_Wq8dnQg&s"
           }
           className="h-8 w-8 rounded-full cursor-pointer"
-          onClick={() => setRightPanel("USER")}
+          onClick={() => setRightPanel(currentUser.userId)}
         />
       </div>
     </div>

@@ -7,6 +7,7 @@ import connectToDatabase from "./db/db.js";
 import bodyParser from "body-parser";
 import AuthRouter from "./routes/auth.routes.js";
 import FriendRouter from "./routes/friend.routes.js";
+import MessageRouter from "./routes/message.route.js";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 app.use("/api/auth", AuthRouter);
 app.use("/api/friend", FriendRouter);
+app.use("/api/messages", MessageRouter);
 
 connectToDatabase();
 

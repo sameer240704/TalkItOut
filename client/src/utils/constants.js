@@ -13,3 +13,6 @@ export const FRIEND_ROUTES = `${HOST}/api/friend`;
 export const FRIEND_REQUEST_ROUTE = `${FRIEND_ROUTES}/add-friend`;
 export const GET_ALL_USERS_ROUTE = `${FRIEND_ROUTES}/get-all-users`;
 export const GET_ALL_USER_FRIENDS = `${FRIEND_ROUTES}/get-users-friends`;
+
+export const MESSAGE_ROUTES = `${HOST}/api/messages`;
+export const GET_USER_PANEL_DETAILS = `${MESSAGE_ROUTES}/panel-details`;
